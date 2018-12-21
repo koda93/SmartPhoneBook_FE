@@ -2,7 +2,6 @@
   <div class="tagContact" v-if="show">
     <div class="tagContactHeader">
       <span class="back" @click="backFunc"><i class="fa fa-angle-left"></i>태그</span>
-
       <!-- <span v-if="root === 'detail'" class="back" @click="backFunc"><i class="fa fa-angle-left"></i>연락처</span>
       <span v-if="root === 'tag'" class="back" @click="backFunc"><i class="fa fa-angle-left"></i>태그</span> -->
       <span class="title">{{ tagName }} 연락처</span>
@@ -56,10 +55,13 @@
     watch: {
       show () {
         this.editMode = false;
+        window.scrollTo(0,0);
         if (this.show === true) {
+          console.log('tagContact show')
           this.getTagContacts();
         }
         if (this.show === false) {
+          console.log('tagContact show false')
           this.tagContacts = [];
         }
       }
@@ -91,6 +93,7 @@
         this.$http.delete(`/contacts/${this.deleteContactId}/tags/${this.deleteTagId}`, {
           }).then((result => {
             console.log('해당 태그에서 해당 연락처 삭제 성공')
+            this.getTagContacts();
           }))
           .catch(error => {
             alert('에러가 발생했습니다.')

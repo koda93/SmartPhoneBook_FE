@@ -227,6 +227,7 @@ export default {
   },
   watch: {
     show () {
+      window.scrollTo(0,0);
       this.name = "";
       this.phoneArray = [];
       this.emailArray = [];
@@ -371,7 +372,7 @@ export default {
             photo: this.fileBase64,
             type: this.type,
             urls: this.urlArray,
-            // tags: this.tagArray
+            tags: this.tagArray
           }).then((result => {
               console.log('연락처 생성 성공')
               console.log('tag', this.tagArray)
@@ -394,7 +395,7 @@ export default {
             photo: this.fileBase64,
             type: this.type,
             urls: this.urlArray,
-            // tags: this.tagArray
+            tags: this.tagArray
           }).then((result => {
               console.log('연락처 수정 성공')
               console.log('tag==========', this.tagArray)
