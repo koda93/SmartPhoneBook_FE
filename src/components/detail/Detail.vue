@@ -1,5 +1,5 @@
 <template>
-  <div class="detail" v-if="show">
+  <div class="detail" v-if="pageShow">
     <div class="detailHeader">
       <span v-if="root === 'tag'" class="back" @click="backClick"><i class="fa fa-angle-left"></i>{{tagName}} 연락처</span>
       <span v-if="root === 'list'" class="back" @click="backClick"><i class="fa fa-angle-left"></i>연락처</span>
@@ -20,13 +20,15 @@
     <div class="detailBody">
       <ul>
         <li class="tagList" v-if="selectedContact.tags && selectedContact.tags.length !== 0">
-          <span class="tagSpan" v-for="tag in selectedContact.tags" @click="openDetailTagContact(tag.id, tag.name)">#{{tag.name}}</span>
+          <span class="tagSpan" v-for="tag in tagSort" @click="openDetailTagContact(tag.id, tag.name)">#{{tag.name}}</span>
         </li>
 
         <!-- 전화번호 -->
         <li v-for="digit in selectedContact.digits">
           <p>{{digit.category.name}}</p>
-          <a href="tel:">{{digit.numbers.first}}-{{digit.numbers.second}}-{{digit.numbers.third}}</a>
+          <a v-if="digit.numbers.third !== null" :href="`tel:${digit.numbers.first}${digit.numbers.second}${digit.numbers.third}`">{{digit.numbers.first}}-{{digit.numbers.second}}-{{digit.numbers.third}}</a>
+          <a v-if="digit.numbers.second !== null && digit.numbers.third === null" :href="`tel:${digit.numbers.first}${digit.numbers.second}`">{{digit.numbers.first}}-{{digit.numbers.second}}</a>
+          <a v-if="digit.numbers.second === null" :href="`tel:${digit.numbers.first}`">{{digit.numbers.first}}</a>
         </li>
 
         <!-- 기타 정보 -->
@@ -43,7 +45,7 @@
           <!-- 주소 -->
           <div>
             {{info.contents}}
-            <i class="fa fa-map-marker"></i>
+            <a :href="`https://www.google.co.kr/maps/search/${info.contents}`" target="_blanck"><i class="fa fa-map-marker"></i></a>
           </div>
         </li>
 
@@ -74,7 +76,7 @@
     </div>
     <create-component :show="openEdit" :mode="'edit'" :selectedContact="selectedContact" @close="openEdit = false"></create-component>
     <confirm-modal :show="openConfirmModal" :content="confirmContent" :contactName="selectedContact.name" @onDelete="onDelete" @close="openConfirmModal = false"></confirm-modal>
-    <detail-tag-contact :show="showDetailTagContact" :tagId="selectedTagId" :tagName="selectedTagName" @close="showDetailTagContact = false"></detail-tag-contact>
+    <tag-contact :show="openTagContact" :tagId="selectedTagId" :tagName="selectedTagName" :detailId="selectedContact.id" :detailName="selectedContact.name" :root="'detail'" @close="openTagContact = false"></tag-contact>
   </div>
 </template>
 
@@ -82,7 +84,7 @@
   import CreateComponent from '../create/Create'
   import ConfirmModal from '../../utilities/confirmModal/ConfirmModal'
   import ConfirmData from '../../utilities/confirmModal/ConfirmData.json'
-  import DetailTagContact from '../detailTagContact/DetailTagContact'
+  import TagContact from '../tagContact/TagContact'
 
   export default {
     name: 'Detail',
@@ -93,11 +95,12 @@
         isCreateMode: false,
         selectedContact: {},
         openEdit: false,
+        openTagContact: false,
         openConfirmModal: false,
         confirmContent: {},
-        showDetailTagContact: false,
         selectedTagId: 0,
         selectedTagName: "",
+        pageShow: false,
       }
     },
     watch: {
@@ -106,6 +109,7 @@
         if (this.show) {
           this.getContactDetail();
           this.selectedContact = {};
+          // this.pageShow = true;
         }
         window.scrollTo(0,0);
       },
@@ -116,10 +120,16 @@
       }
     },
     computed: {
+      tagSort () {
+        return this.selectedContact.tags.sort((a, b) => {
+          return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+        });
+      },
     },
     methods: {
       openDetailTagContact (_tagId, _tagName) {
-        this.showDetailTagContact = true;
+        console.log('sdfsdfdfsdf', _tagId, this.selectedContact.id)
+        this.openTagContact = true;
         this.selectedTagId = _tagId;
         this.selectedTagName = _tagName;
       },
@@ -133,6 +143,7 @@
       backClick () {
         console.log('back')
         this.$emit('close');
+        this.pageShow = false;
       },
       // 연락처 세부정보 가져오기
       getContactDetail () {
@@ -141,9 +152,10 @@
         }).then((result => {
             this.selectedContact = result.data;
             console.log('api 호출', this.selectedContact)
+            this.pageShow = true;
           }))
           .catch(error => {
-            alert('에러가 발생했습니다.')
+            alert('오류가 발생했습니다.')
           })
       },
       // 연락처 삭제 버튼 클릭
@@ -159,14 +171,14 @@
             this.backClick()
           }))
           .catch(error => {
-            alert('에러가 발생했습니다.')
+            alert('오류가 발생했습니다.')
           })
       }
     },
     components: { 
       CreateComponent,
       ConfirmModal,
-      DetailTagContact,
+      TagContact,
     }
   }
 </script>

@@ -1,7 +1,8 @@
 <template>
   <div class="tagContact" v-if="show">
     <div class="tagContactHeader">
-      <span class="back" @click="backFunc"><i class="fa fa-angle-left"></i>태그</span>
+      <span v-if="root !== 'detail'" class="back" @click="backFunc"><i class="fa fa-angle-left"></i>태그</span>
+      <span v-if="root === 'detail'" class="back" @click="backFunc"><i class="fa fa-angle-left"></i>{{detailName}}</span>
       <!-- <span v-if="root === 'detail'" class="back" @click="backFunc"><i class="fa fa-angle-left"></i>연락처</span>
       <span v-if="root === 'tag'" class="back" @click="backFunc"><i class="fa fa-angle-left"></i>태그</span> -->
       <span class="title">{{ tagName }} 연락처</span>
@@ -30,13 +31,13 @@
 </template>
 
 <script>
-  import DetailComponent from '../detail/Detail'
+  // import DetailComponent from '../detail/Detail'
   import ConfirmModal from '../../utilities/confirmModal/ConfirmModal'
   import ConfirmData from '../../utilities/confirmModal/ConfirmData.json'
 
   export default {
     name: 'TagContact',
-    props: ['show', 'tagId', 'tagName'],
+    props: ['show', 'tagId', 'tagName', 'root', 'detailName', 'detailId'],
     data () {
       return {
         openDetail: false,
@@ -63,6 +64,11 @@
         if (this.show === false) {
           console.log('tagContact show false')
           this.tagContacts = [];
+        }
+      },
+      openDetail () {
+        if (this.openDetail === false) {
+          this.getTagContacts();
         }
       }
     },
@@ -96,15 +102,19 @@
             this.getTagContacts();
           }))
           .catch(error => {
-            alert('에러가 발생했습니다.')
+            alert('오류가 발생했습니다.')
           })
       },
       backFunc () {
         this.$emit('close')
       },
       openDetailFunc (userId) {
-        this.openDetail = true;
-        this.selectedUserId = userId;
+        if (this.detailId !== userId) {
+          this.openDetail = true;
+          this.selectedUserId = userId;
+        } else {
+          this.backFunc();
+        }
       },
       getTagContacts () {
         this.$http.get(`/tags/${this.tagId}`, {
@@ -112,7 +122,7 @@
             this.tagContacts = result.data;
           }))
           .catch(error => {
-            alert('에러가 발생했습니다.')
+            alert('오류가 발생했습니다.')
           })
       },
       editTagSave () {
@@ -121,7 +131,7 @@
       }
     },
     components: {
-      DetailComponent,
+      DetailComponent : () => import ('../detail/Detail.vue'),
       ConfirmModal
     },
   }

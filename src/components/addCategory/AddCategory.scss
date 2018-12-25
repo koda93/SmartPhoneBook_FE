@@ -1,4 +1,4 @@
-.detailTagContact {
+.addCategory {
     z-index: 998;
     display: inline-block;
     margin: 0;
@@ -11,7 +11,7 @@
 }
 
 
-.detailTagContact {
+.addCategory {
     position: fixed;
     top: 0;
     left: 0;
@@ -25,7 +25,7 @@
     display: table;
 
     // 팝업창
-    .detailTagContactWrapper {
+    .addCategoryWrapper {
         width: 90%;
         height: 500px;
         border-radius: 10px;
@@ -38,26 +38,26 @@
         right: 0;
         margin: auto;
 
-        .detailTagContactHeader {
+        .addCategoryHeader {
             color: white;
             background: #FE642E;
-            font-weight: bold;
+            font-weight: 500;
             border-radius: 10px 10px 0 0;
 
             .title {
                 line-height: 50px;
-                margin-left: -26px;
+                margin-right: -46px;
             }
 
-            i.fa-times {
-                float: left;
-                color: white;
-                margin-left: 20px;
+            span.save {
+                float: right;
+                height: 50px;
                 line-height: 50px;
+                margin-right: 20px;
             }
         }
 
-        .detailTagContactBody {
+        .addCategoryBody {
             color: black;
             height: 430px;
             padding: 10px 0 10px 20px;
@@ -81,27 +81,34 @@
                 padding: 10px 0 10px 5px;
             }
 
-        }
-
-        .detailTagContactFooter {
-            height: 50px;
-
-            button {
-                display: inline-block;
-                width: 100px;
-                height: 40px;
-                background: white;
-                border: 3px solid #FE642E;
-                color: #FE642E;
-                font-size: 1em;
-                font-weight: 600;
-                margin: 0;
+            i.fa-plus-circle {
+                font-size: 1.6em;
+                padding-right: 10px;
+                color: #6cd800;
+                vertical-align: middle;
             }
 
-            button:hover {
+            i.fa-minus-circle {
+                font-size: 1.6em;
+                padding-right: 5px;
+                color: rgb(216, 0, 0);
+                vertical-align: middle;
+            }
+
+            .addClass {
+                float: right;
+                width: 60px;
+                margin: 0;
+                height: 30px;
+                font-size: 0.7em;
                 color: white;
-                background: #FE642E;
+                background: #6cd800;
+                box-shadow: 1px 1px 1px lightgrey;
+                margin-right: 10px;
+                border-radius: 10px;
+                font-size: .8em;
+                border: none;
             }
         }
     }
-}
+} 

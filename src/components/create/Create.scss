@@ -48,7 +48,7 @@
 
     .createBody {
         margin-top: 60px;
-        padding: 10px 25px 150px 25px;
+        padding: 10px 25px 200px 25px;
 
         .addPhoto {
             float: left;
@@ -60,6 +60,17 @@
                 color: lightgray;
                 position: absolute;
                 margin-left: -25px;
+            }
+
+            i.fa-minus-circle {
+                font-size: 1.4em;
+                padding-right: 14px;
+                color: #d80000;
+                height: 40px;
+                z-index: 991;
+                margin-left: 13px;
+                margin-top: -13px;
+                line-height: 40px;
             }
 
             button {
@@ -131,11 +142,11 @@
             }
 
             .important {
-                z-index: 998;
+                z-index: 990;
             }
 
             .FILE_FORM {
-                z-index: 998;
+                z-index: 990;
             }
             
             .thumb img {
@@ -210,17 +221,25 @@
                 }
 
                 .leftSection {
-                    width: 114px;
+                    width: 130px;
                     display: inline-flex;
 
                     .sort {
                         width: 80%;
+                        display: inline-block;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        padding: 0;
                     }
+                }
+                .date {
+                    width: 110px;
                 }
 
                 input {
                     border: none;
-                    width: calc(100% - 132px);
+                    width: calc(100% - 140px);
                     vertical-align: top;
                     height: 40px;
                     line-height: 40px;
@@ -240,20 +259,25 @@
                         width: 20px;
                         // z-index: 100;
                         background: none;
-                        vertical-align: baseline;
+                        vertical-align: sub;
     
                         a {
                             color: black;
+                        }
+
+                        .editCategory {
+                            color: #FE642E;
                         }
                     }
     
                     .btn-group > .btn:first-child {
                         background: none;
                         border: none;
-                        color: orangered;
+                        color: #FE642E;
                         margin: 0;
                         padding: 0;
-                        height: 10px;
+                        // height: 10px;
+                        margin-top: -5px;
                     }
     
                     .btn-group > .btn:first-child:hover {
@@ -265,12 +289,14 @@
                         padding: 0 1.5em;
                         font-size: 0.9em;
                     }
+
+                    
                 }
             }
 
             .contactDelete {
                 margin-top: 50px;
-                margin-bottom: 100px;
+                margin-bottom: 200px;
                 color: #FE642E;
                 // border-bottom: 1px solid lightgray;
             }
@@ -315,6 +341,10 @@
             margin-top: 10px;
             padding: 10px;
         }
+    }
+
+    .dropdown-menu.dropdown-menu-right.show {
+        box-shadow: 1px 1px 1px lightgray;
     }
 }
 

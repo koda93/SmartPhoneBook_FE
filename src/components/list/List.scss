@@ -50,7 +50,8 @@
                     color: orangered;
                     margin: 0;
                     padding: 0;
-                    height: 10px;
+                    // height: 10px;
+                    margin-top: -5px;
                 }
 
                 .btn-group > .btn:first-child:hover {
@@ -102,7 +103,7 @@
     }
 
     .listBody {
-        margin-bottom: 150px;
+        margin-bottom: 200px;
         overflow: auto;
 
         .listTitle {

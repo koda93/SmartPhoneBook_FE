@@ -11,15 +11,17 @@
         <i v-if="!hasPhoto" class="fa fa-user-circle"></i>
         <button v-if="!hasPhoto" class="replace"><span>사진<br/>추가</span></button>
 
+        <i v-if="hasPhoto" class="fa fa-minus-circle" @click="deletePhoto"></i>
         <div v-show="hasPhoto" class="thumb important">
           <img id="preview" src="">
         </div>
 
-        <div v-if="photoArray" class="thumb">
+        <i v-if="photoArray.length > 0" class="fa fa-minus-circle" @click="deletePhotoArray"></i>
+        <div v-if="photoArray.length > 0" class="thumb">
           <img :src="photoArray"/>
         </div>
         <form id="FILE_FORM" method="post" enctype="multipart/form-data" action="">
-          <input type="file" name="upFile" id="upFile" @change="fileSelect" class="upload">
+          <input type="file" name="upFile" id="upFile" @change="fileSelect" class="upload" value="">
         </form>
       </div>
       <div class="addName">
@@ -44,15 +46,15 @@
             <span class="sort">{{ phone.category.name }}</span>
             <span class="rightIcon">
               <b-dropdown right class="dropdown">
-                <b-dropdown-item @click="phone.category = { id: 1, name: '휴대전화' }">휴대전화</b-dropdown-item>
-                <b-dropdown-item @click="phone.category = { id: 2, name: '집' }">집</b-dropdown-item>
-                <b-dropdown-item @click="phone.category = { id: 3, name: '직장' }">직장</b-dropdown-item>
-                <b-dropdown-item @click="phone.category = { id: 4, name: '팩스' }">팩스</b-dropdown-item>
-                <b-dropdown-item @click="phone.category = { id: 5, name: '기타' }">기타</b-dropdown-item>
+                <b-dropdown-item v-for="category in digitCategories" :key="category.id" @click="setCategory(phone, category.id, category.name)">{{category.name}}</b-dropdown-item>
+                <b-dropdown-divider></b-dropdown-divider>
+                <b-dropdown-item @click="addCategory('전화번호')" class="editCategory">
+                  <i class="fa fa-plus"></i>&nbsp;&nbsp;카테고리 편집
+                </b-dropdown-item>
               </b-dropdown>
             </span>
           </div>
-          <input id="number" type="text" placeholder="전화" v-model="phone.number" @keyup="phoneNumberChange">
+          <input id="tel" type="text" placeholder="전화" v-model="phone.number" @keyup="phoneNumberChange(phone.number)">
         </div>
 
         <div class="addDetailList addTitle">
@@ -67,9 +69,11 @@
             <span class="sort">{{ email.category.name }}</span>
             <span class="rightIcon">
               <b-dropdown right class="dropdown">
-                <b-dropdown-item @click="email.category = { id: 9, name: '개인' }">개인</b-dropdown-item>
-                <b-dropdown-item @click="email.category = { id: 10, name: '직장' }">직장</b-dropdown-item>
-                <b-dropdown-item @click="email.category = { id: 11, name: '기타' }">기타</b-dropdown-item>
+                <b-dropdown-item v-for="category in emailCategories" :key="category.id" @click="setCategory(email, category.id, category.name)">{{category.name}}</b-dropdown-item>
+                <b-dropdown-divider></b-dropdown-divider>
+                <b-dropdown-item @click="addCategory('이메일')" class="editCategory">
+                  <i class="fa fa-plus"></i>&nbsp;&nbsp;카테고리 편집
+                </b-dropdown-item>
               </b-dropdown>
             </span>
           </div>
@@ -88,9 +92,11 @@
             <span class="sort">{{ address.category.name }}</span>
             <span class="rightIcon">
               <b-dropdown right class="dropdown">
-                <b-dropdown-item @click="address.category = { id: 15, name: '집' }">집</b-dropdown-item>
-                <b-dropdown-item @click="address.category = { id: 16, name: '직장' }">직장</b-dropdown-item>
-                <b-dropdown-item @click="address.category = { id: 17, name: '기타' }">기타</b-dropdown-item>
+                <b-dropdown-item v-for="category in addressCategories" :key="category.id" @click="setCategory(address, category.id, category.name)">{{category.name}}</b-dropdown-item>
+                <b-dropdown-divider></b-dropdown-divider>
+                <b-dropdown-item @click="addCategory('주소')" class="editCategory">
+                  <i class="fa fa-plus"></i>&nbsp;&nbsp;카테고리 편집
+                </b-dropdown-item>
               </b-dropdown>
             </span>
           </div>
@@ -102,24 +108,25 @@
           <span>주소 추가</span>
         </div>
 
-        <!-- 생일 -->
+        <!-- 기념일 -->
         <div class="addDetailList add" v-for="(date, index) in dateArray">
           <div class="leftSection">
             <i class="fa fa-minus-circle" @click="subDate(index)"></i>
             <span class="sort">{{ date.category.name }}</span>
             <span class="rightIcon">
               <b-dropdown right class="dropdown">
-                <b-dropdown-item @click="date.category = { id: 12, name: '생일' }">생일</b-dropdown-item>
-                <b-dropdown-item @click="date.category = { id: 13, name: '기념일' }">기념일</b-dropdown-item>
-                <b-dropdown-item @click="date.category = { id: 14, name: '기타' }">기타</b-dropdown-item>
+                <b-dropdown-item v-for="category in dateCategories" :key="category.id" @click="setCategory(date, category.id, category.name)">{{category.name}}</b-dropdown-item>
+                <b-dropdown-divider></b-dropdown-divider>
+                <b-dropdown-item @click="addCategory('기념일')" class="editCategory">
+                  <i class="fa fa-plus"></i>&nbsp;&nbsp;카테고리 편집
+                </b-dropdown-item>
               </b-dropdown>
             </span>
           </div>
-          <!-- <input type="text" placeholder="주소" v-model="date.text"> -->
           <date-dropdown
             min="1930"
             max="2018"
-            :default="nowDate"
+            :default="date.contents"
             v-model="date.contents"
           >
           </date-dropdown>
@@ -127,7 +134,7 @@
 
         <div class="addDetailList addTitle">
           <i class="fa fa-plus-circle" @click="addDate"></i>
-          <span>생일/기념일 추가</span>
+          <span>기념일 추가</span>
         </div>
 
         <!-- URL -->
@@ -137,9 +144,11 @@
             <span class="sort">{{ url.category.name }}</span>
             <span class="rightIcon">
               <b-dropdown right class="dropdown">
-                <b-dropdown-item @click="url.category = { id: 6, name: '개인' }">개인</b-dropdown-item>
-                <b-dropdown-item @click="url.category = { id: 7, name: '직장' }">직장</b-dropdown-item>
-                <b-dropdown-item @click="url.category = { id: 8, name: '기타' }">기타</b-dropdown-item>
+                <b-dropdown-item v-for="category in urlCategories" :key="category.id" @click="setCategory(url, category.id, category.name)">{{category.name}}</b-dropdown-item>
+                <b-dropdown-divider></b-dropdown-divider>
+                <b-dropdown-item @click="addCategory('URL')" class="editCategory">
+                  <i class="fa fa-plus"></i>&nbsp;&nbsp;카테고리 편집
+                </b-dropdown-item>
               </b-dropdown>
             </span>
           </div>
@@ -156,22 +165,30 @@
           <span class="memo">메모 추가</span>
           <textarea name="" id="" cols="30" rows="10" placeholder="메모" v-model="memoContents"></textarea>
         </div>
-        <!-- {{selectedContact.id}} -->
       </div>
     </div>
     <tag-select :show="openTagSelect" :tagArray="tagArray" @close="openTagSelect = false" @editTags="editTagsFunc"></tag-select>
+    <add-category :show="showAddCategory" :categoryName="categoryName" @close="showAddCategory = false"></add-category>
   </div>
 </template>
 
 <script>
 import DateDropdown from './Dropdown.vue'
 import TagSelect from '../tagSelect/TagSelect'
+import AddCategory from '../addCategory/AddCategory'
 
 export default {
   name: 'Create',
   props: ['show', 'selectedContact', 'mode'],
   data () {
     return {
+      digitCategories: [],
+      emailCategories: [],
+      addressCategories: [],
+      dateCategories: [],
+      urlCategories: [],
+      showAddCategory: false,
+      categoryName: "",
       hasPhoto: false,
       fileObj: "",
       pathHeader: "",
@@ -242,14 +259,28 @@ export default {
       this.tagArray = [];
       this.hasPhoto = false;
 
+      if (this.show) {
+        this.getCategory('DIGIT');
+        this.getCategory('EMAIL');
+        this.getCategory('ADDRESS');
+        this.getCategory('DATE');
+        this.getCategory('URL');
+      }
       if (this.show && this.selectedContact) {
         this.name = this.selectedContact.name;
         if (this.selectedContact.digits.length !== 0) {
           this.phoneArray = this.selectedContact.digits;
           for (let i=0; i<this.phoneArray.length; i++) {
-            this.phoneArray[i].number = this.phoneArray[i].numbers.first + '-';
-            this.phoneArray[i].number += this.phoneArray[i].numbers.second + '-';
-            this.phoneArray[i].number += this.phoneArray[i].numbers.third;
+            if (this.phoneArray[i].numbers.third !== null) {
+              this.phoneArray[i].number = this.phoneArray[i].numbers.first + '-';
+              this.phoneArray[i].number += this.phoneArray[i].numbers.second + '-';
+              this.phoneArray[i].number += this.phoneArray[i].numbers.third;
+            } else if (this.phoneArray[i].numbers.third === null && this.phoneArray[i].numbers.second !== null) {
+              this.phoneArray[i].number = this.phoneArray[i].numbers.first + '-';
+              this.phoneArray[i].number += this.phoneArray[i].numbers.second
+            } else if (this.phoneArray[i].numbers.second === null) {
+              this.phoneArray[i].number = this.phoneArray[i].numbers.first
+            }
           }
         }
         if (this.selectedContact.infoes.length !== 0) {
@@ -262,7 +293,6 @@ export default {
             }
             if (this.selectedContact.infoes[i].category.type === 'DATE') {
               this.dateArray.push(this.selectedContact.infoes[i]);
-              console.log(this.dateArray)
             }
             if (this.selectedContact.infoes[i].category.type === 'URL') {
               this.urlArray.push(this.selectedContact.infoes[i]);
@@ -278,6 +308,13 @@ export default {
           this.photoArray = this.selectedContact.photoPath;
         }
       }
+    },
+    showAddCategory () {
+      this.getCategory('DIGIT');
+      this.getCategory('EMAIL');
+      this.getCategory('ADDRESS');
+      this.getCategory('DATE');
+      this.getCategory('URL');
     }
   },
   computed: {
@@ -288,6 +325,44 @@ export default {
     }
   },
   methods: {
+    deletePhotoArray () {
+      this.photoArray = [];
+    },
+    deletePhoto () {
+      console.log('deletePhoto');
+      this.initialize();
+    },
+    setCategory (object, _categoryId, _categoryName) {
+      object.category = {
+        id: _categoryId,
+        name: _categoryName
+      }
+    },
+    getCategory (_categoryName) {
+      // this.setCategoryType();
+      this.$http.get(`/categories/${_categoryName}`, {
+      }).then((result => {
+          if (_categoryName === 'DIGIT') {
+            this.digitCategories = result.data;
+          } else if (_categoryName === 'EMAIL') {
+            this.emailCategories = result.data;
+          } else if (_categoryName === 'ADDRESS') {
+            this.addressCategories = result.data;
+          } else if (_categoryName === 'DATE') {
+            this.dateCategories = result.data;
+          } else if (_categoryName === 'URL') {
+            this.urlCategories = result.data;
+          }
+          console.log('category----------------------', result.data);
+        }))
+        .catch(error => {
+          alert('오류가 발생했습니다.')
+        })
+    },
+    addCategory(_categoryName) {
+      this.showAddCategory = true;
+      this.categoryName = _categoryName;
+    },
     fileSelect () {
       this.fileObj = document.getElementById("upFile").value;
       this.pathHeader = this.fileObj.lastIndexOf("\\");
@@ -298,7 +373,7 @@ export default {
       this.extName = this.fileObj.substring(this.pathMiddle+1, this.pathEnd);
 
       // 파일형식 제한
-      if (this.extName.toUpperCase() != 'PNG' && this.extName.toUpperCase() != 'JPG') {
+      if (this.extName.toUpperCase() != 'PNG' && this.extName.toUpperCase() != 'JPG' && this.extName.toUpperCase() != 'JPEG') {
         alert('지원하지 않는 파일형식입니다.');
         this.initialize();
       } else {
@@ -332,10 +407,13 @@ export default {
       }
     },
     initialize () {
-      this.file = "";
-      document.getElementById("upFile").value = ""
-      document.querySelector('#preview').src = "";
       this.hasPhoto = false;
+      if (document.getElementById("upFile") !== null) {
+        this.file = "";
+        document.getElementById("upFile").value = ""
+        document.querySelector('#preview').src = "";
+        this.fileBase64 = "";
+      }
     },
     editTagsFunc (updatedTagArray) {
       this.tagArray = updatedTagArray;
@@ -344,7 +422,7 @@ export default {
     addTagButton () {
       this.openTagSelect = true;
     },
-    phoneNumberChange () {
+    phoneNumberChange (_number) {
     },
     backFunc () {
       this.$emit('close')
@@ -359,6 +437,38 @@ export default {
             second: this.phoneArray[i].number.split('-')[1],
             third: this.phoneArray[i].number.split('-')[2],
           }
+          delete this.phoneArray[i].number;
+          delete this.phoneArray[i].id;
+          delete this.phoneArray[i].category.isDefault;
+        }
+      }
+      if (this.tagArray.length > 0) {
+        for (let i=0; i<this.tagArray.length; i++) {
+          delete this.tagArray[i].checked;
+        }
+      }
+      if (this.emailArray.length > 0) {
+        for (let i=0; i<this.emailArray.length; i++) {
+          delete this.emailArray[i].category.isDefault;
+          delete this.emailArray[i].id;
+        }
+      }
+      if (this.addressArray.length > 0) {
+        for (let i=0; i<this.addressArray.length; i++) {
+          delete this.addressArray[i].category.isDefault;
+          delete this.addressArray[i].id;
+        }
+      }
+      if (this.dateArray.length > 0) {
+        for (let i=0; i<this.dateArray.length; i++) {
+          delete this.dateArray[i].category.isDefault;
+          delete this.dateArray[i].id;
+        }
+      }
+      if (this.urlArray.length > 0) {
+        for (let i=0; i<this.urlArray.length; i++) {
+          delete this.urlArray[i].category.isDefault;
+          delete this.urlArray[i].id;
         }
       }
       if (this.name !== "") {
@@ -378,10 +488,12 @@ export default {
               console.log('연락처 생성 성공')
               this.$emit('close');
               this.initialize();
+              console.log('ddddddddd', this.name.length)
             }))
             .catch(error => {
-              alert('에러가 발생했습니다.')
+              alert('오류가 발생했습니다.')
               this.initialize();
+              console.log('emailArray', this.emailArray)
             })
         } else {
           this.$http.put(`/contacts/${this.selectedContact.id}`, {
@@ -400,18 +512,23 @@ export default {
               console.log('연락처 수정 성공')
               this.$emit('close');
               this.initialize();
+              console.log('photoPath', this.selectedContact.photoPath)
             }))
             .catch(error => {
-              alert('에러가 발생했습니다.')
+              alert('오류가 발생했습니다.')
               this.initialize();
+              console.log('---------')
+              console.log(this.type)
+              console.log(this.selectedContact.id, this.addressArray, this.dateArray, this.phoneArray, this.emailArray, this.memoContents, this.name, this.fileBase64, this.type, this.urlArray, this.tagArray)
             })
         }
-      } else {
+      } else if (this.name === "") {
         alert('이름을 입력해주세요.')
       }
     },
     // 번호 추가
     addPhone () {
+      var _newPhone = Object.assign({}, this.newPhone);
       var _newPhone = Object.assign({}, this.newPhone, {id: new Date().getTime()});
       this.phoneArray.push(_newPhone);
       console.log('phoneArray', this.phoneArray);
@@ -423,6 +540,7 @@ export default {
     },
     // 이메일 추가
     addEmail () {
+      var _newEmail = Object.assign({}, this.newEmail);
       var _newEmail = Object.assign({}, this.newEmail, {id: new Date().getTime()});
       this.emailArray.push(_newEmail);
       console.log('emailArray', this.emailArray);
@@ -434,6 +552,7 @@ export default {
     },
     // 주소 추가
     addAddress () {
+      var _newAddress = Object.assign({}, this.newAddress);
       var _newAddress = Object.assign({}, this.newAddress, {id: new Date().getTime()});
       this.addressArray.push(_newAddress);
       console.log('addressArray', this.addressArray);
@@ -445,6 +564,7 @@ export default {
     },
     // 생일 추가
     addDate () {
+      var _newDate = Object.assign({}, this.newDate);
       var _newDate = Object.assign({}, this.newDate, {id: new Date().getTime()});
       this.dateArray.push(_newDate);
       console.log(this.dateArray)
@@ -455,6 +575,7 @@ export default {
     },
     // url 추가
     addUrl () {
+      var _newUrl = Object.assign({}, this.newUrl);
       var _newUrl = Object.assign({}, this.newUrl, {id: new Date().getTime()});
       this.urlArray.push(_newUrl);
     },
@@ -465,7 +586,8 @@ export default {
   },
   components: {
     DateDropdown,
-    TagSelect
+    TagSelect,
+    AddCategory,
   },
 }
 </script>
